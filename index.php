@@ -37,12 +37,15 @@ use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
             <h2>Temperature: <?php echo  $temperature ?></h2>
             <h2>Wind: <?php echo $windspeed . " " . $winddirection ?></h2>
             <h2>Humidity: <?php echo $humidity ?></h2>
+            <!-- simple return to homepage - since anything besides post returns homepage, any get request will return it -->
             <form method="get">
                 <button type="submit">Return to home</button>
             </form>
         <?php
+        //handling openweathermap specific exceptions
         } catch (OWMException $e) {
             echo 'OpenWeatherMap exception: ' . $e->getMessage() . ' (Code ' . $e->getCode() . ').';
+        // handling general exceptions
         } catch (\Exception $e) {
             echo 'General exception: ' . $e->getMessage() . ' (Code ' . $e->getCode() . ').';
         }
