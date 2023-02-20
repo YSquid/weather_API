@@ -13,35 +13,51 @@ use Http\Factory\Guzzle\RequestFactory;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 ?>
 <html>
+
 <body>
     <h1>Weather query</h1>
-<?php
-// check the php superglobal SERVER['REQUEST_METHOD'] for post - strtolower to normalize - if post has been done, get our weather data
-if ( 'post' === strtolower($_SERVER['REQUEST_METHOD'])) {
-    $city = $_POST['city'];
-    //create OpenWeatherMap instance - 3 options - API key, http client implementation, and http request factory
-    $owm = new OpenWeatherMap($_ENV['API_KEY'], GuzzleAdapter::createWithConfig([]), new RequestFactory());
-    try {
-        //weather object - call to the owm object's getWeather method
-        $weather = $owm->getWeather($city, 'metric', 'en');
-        //print to the screen - the temperature key on the weather object
-        ?><h2><?php echo $weather->temperature; ?></h2>
-        <?php
-    } catch(OWMException $e) {
-        echo 'OpenWeatherMap exception: ' . $e->getMessage() . ' (Code ' . $e->getCode() . ').';
-    } catch(\Exception $e) {
-        echo 'General exception: ' . $e->getMessage() . ' (Code ' . $e->getCode() . ').';
-    }
-    //if method is not post, return the form to select our city, and post it on submit
-    } else {
+    <?php
+    // check the php superglobal SERVER['REQUEST_METHOD'] for post - strtolower to normalize - if post has been done, get our weather data
+    if ('post' === strtolower($_SERVER['REQUEST_METHOD'])) {
+        $city = $_POST['city'];
+        //create OpenWeatherMap instance - 3 options - API key, http client implementation, and http request factory
+        $owm = new OpenWeatherMap($_ENV['API_KEY'], GuzzleAdapter::createWithConfig([]), new RequestFactory());
+        try {
+            //weather object - call to the owm object's getWeather method
+            $weather = $owm->getWeather($city, 'metric', 'en');
+            // getting values from weather object
+            $temperature = $weather->temperature;
+            $windspeed = $weather->wind->speed;
+            $winddirection = $weather->wind->direction;
+            $humidity =  $weather->humidity;
+
+            //print to the screen - the temperature key on the weather object
     ?>
+            <h1><?= $city ?></h1>
+            <h2>Temperature: <?php echo  $temperature ?></h2>
+            <h2>Wind: <?php echo $windspeed . " " . $winddirection ?></h2>
+            <h2>Humidity: <?php echo $humidity ?></h2>
+            <form method="get">
+                <button type="submit">Return to home</button>
+            </form>
+        <?php
+        } catch (OWMException $e) {
+            echo 'OpenWeatherMap exception: ' . $e->getMessage() . ' (Code ' . $e->getCode() . ').';
+        } catch (\Exception $e) {
+            echo 'General exception: ' . $e->getMessage() . ' (Code ' . $e->getCode() . ').';
+        }
+        //if method is not post, return the form to select our city, and post it on submit
+    } else {
+        ?>
         <form method="post">
             <label for="city">Select your city</label>
             <select name="city" id="city">
-                <option value="London">London</option>
-                <option value="Buenos Aires">Buenos Aires</option>
-                <option value="New York">New York</option>
-                <option value="Paris">Paris</option>
+                <option value="Calgary">Calgary</option>
+                <option value="Edmonton">Edmonton</option>
+                <option value="Regina">Regina</option>
+                <option value="Saskatoon">Saskatoon</option>
+                <option value="Vancouver">Vancouver</option>
+                <option value="Winnipeg">Winnipeg</option>
             </select>
             <input type="submit" value="Get your city's temperature">
         </form>
